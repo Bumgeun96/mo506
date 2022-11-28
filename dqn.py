@@ -92,6 +92,8 @@ class DQN:
         if self._iterations  % self.update_steps == 0: 
             update_target_model(self.net, self.target_net)
     
+    
+    ######################################################################################
     def select_action(self, state):
         state = torch.Tensor(state).to(self.device)
         qvalue = self.net(state)
@@ -101,14 +103,10 @@ class DQN:
         random_actions = random.randrange(self.act_size)
         picked_actions = pick_random * random_actions + (1 - pick_random) * np.argmax(qvalue)
         return picked_actions
-    
-    
 
     def store_experience(self, state, next_state, act, rew, done):
         self.memory.push(state, next_state, act, rew, done)
         self.epsilon = max(self.epsilon - self.dec_epsilon, self.final_epsilon)
-
-      
 
     def save_checkpoint(self, iteration):
         if iteration % self.save_num ==0:
