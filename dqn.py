@@ -24,7 +24,7 @@ class DQN:
         self.discount_factor = 0.99
         self.train = train
         if self.train:
-            self.epsilon = 0.95  
+            self.epsilon = 0.95
         else:
             self.epsilon = 0 # Greedy choice
         
@@ -44,9 +44,6 @@ class DQN:
         self.act_size = dim_act
         # self.target_net = Agent(self.num_inputs, self.act_size)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        if self.load == True:
-            self.net.load_state_dict(torch.load(CHECKPOINT+'.pt', map_location=torch.device(self.device)))
         
         # update_target_model(self.net, self.target_net)
         self.net.train()
@@ -91,8 +88,7 @@ class DQN:
         
         if self._iterations  % self.update_steps == 0: 
             update_target_model(self.net, self.target_net)
-    
-    
+     
     ######################################################################################
     def select_action(self, state):
         state = torch.Tensor(state).to(self.device)
@@ -117,3 +113,9 @@ class DQN:
             self._iterations += 1
             self.update_policy()
             self.soft_update_target_network(self.target_net,self.net)
+            
+    def Epsilon(self):
+        print("epsilon:",self.epsilon)
+        
+    def Loss(self):
+        print("loss:",self.loss)
