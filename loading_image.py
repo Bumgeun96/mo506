@@ -46,9 +46,10 @@ def image_truncation(images,center = [50,50],hor = 10,ver = 10):
         horizontal,vertical = image.size
         if center[0]-hor: hor = center[0]
         if center[0]-ver: ver = center[1]
-        croppedImage = image.crop((center[0]-hor,center[1]-ver,center[0]+hor,center[1]+ver)) 
+        croppedImage = image.crop((center[0]-hor,center[1]-ver,center[0]+hor,center[1]+ver))
         croppedImages.append(croppedImage)
     return croppedImages
 
 i,s = image_sentence(n=1)
-image_truncation(i,center = [100,100],hor=100,ver=100)
+croppoedImages = image_truncation(i,center = [100,100],hor=100,ver=100)
+croppoedImages[0].show()
