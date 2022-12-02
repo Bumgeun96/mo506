@@ -1,6 +1,6 @@
 from dqn import DQN
 from loading_bdd100k import get_image_center
-from transformers import pipeline
+from image_captioning import image_to_text
 
 class Player():
     def __init__(self):
@@ -9,7 +9,7 @@ class Player():
         self.max_episode = 100
         self.max_epoch = 1000
         self.dqn_trainer = DQN(self.dqn_obs_size, self.dqn_act_size)
-        self.image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
+        self.image_to_text = image_to_text()
         self.done = False
         
     def image_truncation(self,images,center = [50,50],hor = 10,ver = 10):
@@ -56,9 +56,10 @@ class Player():
     def get_reward(self,state,next_state,image):
         current_image = self.image_truncation(image,[state[0],state[1]],hor=state[-2],ver=state[-1])
         next_image = self.image_truncation(image,center = [next_state[0],next_state[1]],hor=next_state[-2],ver=next_state[-1])
-        current_text = self.image_to_text(current_image[0])
-        next_text = self.image_to_text(next_image[0])
-        print(current_text)
+        current_text = self.image_to_text.image_captioning(current_image[0])
+        next_text = self.image_to_text.image_captioning(next_image[0])
+        print(current_text[0]['generated_text'])
+        # self.image_to_text.score()
         # next_blew_score = model(next_image)
         reward = 1
         return reward
