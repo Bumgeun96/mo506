@@ -1,5 +1,6 @@
 from dqn import DQN
 from loading_bdd100k import get_image_center
+from transformers import pipeline
 
 class Player():
     def __init__(self):
@@ -8,14 +9,13 @@ class Player():
         self.max_episode = 100
         self.max_epoch = 1000
         self.dqn_trainer = DQN(self.dqn_obs_size, self.dqn_act_size)
+        self.image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
         self.done = False
         
     def image_truncation(self,images,center = [50,50],hor = 10,ver = 10):
         croppedImages = []
         for image in images:
             horizontal,vertical = image.size
-            if center[0]-hor: hor = center[0]
-            if center[0]-ver: ver = center[1]
             croppedImage = image.crop((center[0]-hor,center[1]-ver,center[0]+hor,center[1]+ver))
             croppedImages.append(croppedImage)
         return croppedImages
@@ -43,18 +43,22 @@ class Player():
         elif action == 2: # +1 vertical
             if center_y + state[-1] > vertical-2:
                 state[-1] = state[-1]
-            state[-1] = state[-1] + 1
+            else:
+                state[-1] = state[-1] + 1
         elif action == 3: # -1 vertical
             if state[-1] < 11:
                 state[-1] = state[-1]
-            state[-1] = state[-1] - 1
+            else:
+                state[-1] = state[-1] - 1
         next_state = state
         return next_state
     
     def get_reward(self,state,next_state,image):
         current_image = self.image_truncation(image,[state[0],state[1]],hor=state[-2],ver=state[-1])
         next_image = self.image_truncation(image,center = [next_state[0],next_state[1]],hor=next_state[-2],ver=next_state[-1])
-        # blew_score = model(current_image)
+        current_text = self.image_to_text(current_image[0])
+        next_text = self.image_to_text(next_image[0])
+        print(current_text)
         # next_blew_score = model(next_image)
         reward = 1
         return reward
@@ -67,6 +71,7 @@ class Player():
             state, image = self.reset()
             for _ in range(self.max_epoch):
                 action = self.dqn_trainer.select_action(state)
+                # print(state[-2:])
                 next_state = self.step(state,action,image)
                 reward = self.get_reward(state,next_state,image)
                 if _ == self.max_epoch-1:
