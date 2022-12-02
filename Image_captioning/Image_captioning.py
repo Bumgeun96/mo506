@@ -9,8 +9,6 @@
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # model.to(device)
 
-
-
 # max_length = 16
 # num_beams = 4
 # gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
@@ -37,11 +35,15 @@
 
 
 ########################
+'''First you have to do this.'''
+# pip install -U transformers
+
 
 from transformers import pipeline
 
 image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
 
-image_to_text("https://ankur3107.github.io/assets/images/image-captioning-example.png")
+text = image_to_text("./Image_captioning/soccer.png")
+print(text)
 
 # [{'generated_text': 'a soccer game with a player jumping to catch the ball '}]
