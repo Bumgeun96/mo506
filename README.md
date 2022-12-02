@@ -7,6 +7,12 @@ https://huggingface.co/nlpconnect/vit-gpt2-image-captioning
 https://cocodataset.org/#captions-2015
 https://vizwiz.org/tasks-and-datasets/image-captioning/
 
+# flick30k
+## Download the dataset for image caption
+```
+https://kaistackr-my.sharepoint.com/:u:/g/personal/j4t123_kaist_ac_kr/EcHnK2WyP_5Emj9SwbFX7FMBQyWSX47Gl8MNTfYEfWdxbg?e=1xi1mQ
+```
+
 # BDD100K
 ## Download the dataset for object detection
 ```
