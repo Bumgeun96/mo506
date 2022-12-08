@@ -28,8 +28,8 @@ class DQN:
         else:
             self.epsilon = 0 # Greedy choice
         
-        self.final_epsilon = 0.05  # Final epsilon value
-        self.dec_epsilon = 0.000005  # Decrease rate of epsilon for every generation
+        self.final_epsilon = 0.00  # Final epsilon value
+        self.dec_epsilon = 0.00001  # Decrease rate of epsilon for every generation
         #####################################
 
         self.net = Agent(dim_obs, dim_act)  # Q-network
