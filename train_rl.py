@@ -7,8 +7,6 @@ import os
 import pickle
 import math
 
-with open(os.path.dirname(os.path.realpath(__file__))+'/pickle/reward.pickle', 'wb') as f:
-            pickle.dump(["center_x","center_y","hor","ver","reward"],f)
 class Player():
     def __init__(self):
         self.dqn_obs_size = 11 #(hor_c,ver_c, x, y, x1, x2, y1, y2, a, h, v)
@@ -29,15 +27,16 @@ class Player():
     def reset(self):
         image,center_info = get_image_and_center()
         horizontal,vertical = image.size
-        reference_sentence = "a truck is driving down the road"
-        state = [int(horizontal/2),int(vertical/2),center_info[0],center_info[1],center_info[2],center_info[3],center_info[4],center_info[5],center_info[6],300,300]
+        # reference_sentence = "a truck is driving down the road"
+        reference_sentence = "a large group of trucks and cars are driving down a road"
+        state = [int(horizontal/2),int(vertical/2),center_info[0],center_info[1],center_info[2],center_info[3],center_info[4],center_info[5],center_info[6],400,150]
         # state = [int(horizontal/2),int(vertical/2),int(center_info[0]),int(center_info[1])]
         self.done = False
         return state,image,reference_sentence
     
     def step(self,state,action,image):
         state_prime = state[:]
-        step_size = 30
+        step_size = 10
         horizontal,vertical = image.size
         center_x = state_prime[0]
         center_y = state_prime[1]
@@ -109,18 +108,25 @@ class Player():
     def get_reward(self,state,next_state,image,reference):
         current_image = self.image_truncation(image,[state[0],state[1]],hor=state[-2],ver=state[-1])
         # next_image = self.image_truncation(image,center = [next_state[0],next_state[1]],hor=next_state[-2],ver=next_state[-1])
-        current_text = self.image_to_text.image_captioning(current_image[0])
+        # current_text = self.image_to_text.image_captioning(current_image[0])
         # next_text = self.image_to_text.image_captioning(next_image[0])
         # print(current_text[0]['generated_text'])
         # print(reference)
         reward = 0
-        reward = self.image_to_text.score(current_text[0]['generated_text'],reference)
+        if  math.sqrt((state[0]-int(state[2]))**2+(state[1]-int(state[3]))**2) < 14:
+            current_text = self.image_to_text.image_captioning(current_image[0])
+            reward += self.image_to_text.score(current_text[0]['generated_text'],reference)
+        # if self.image_to_text.score(current_text[0]['generated_text'],reference) > 0.8:
+        #     reward += 10
+        # reward = self.image_to_text.score(current_text[0]['generated_text'],reference)
         # if reward > 0.8:
         #     reward += 10
         reward -= math.sqrt((state[0]-int(state[2]))**2+(state[1]-int(state[3]))**2)/100
         return reward
 
     def run(self):
+        with open(os.path.dirname(os.path.realpath(__file__))+'/pickle/reward.pickle', 'wb') as f:
+            pickle.dump(["center_x","center_y","hor","ver","reward"],f)
         for __ in range(self.max_episode):
             print("epi:",__+1)
             self.dqn_trainer.Epsilon()
@@ -144,8 +150,19 @@ class Player():
                 self.dqn_trainer.save_checkpoint(_+1)
             with open(os.path.dirname(os.path.realpath(__file__))+'/pickle/reward.pickle', 'ab') as f:
                 pickle.dump([state[0],state[1],state[-2],state[-1],reward],f)
+            
+    def test(self):
+        state, image,reference = self.reset()
+        for _ in range(self.max_epoch):
+            action = self.dqn_trainer.select_action(state,test=True)
+            state = self.step(state,action,image)
+        current_image = self.image_truncation(image,[state[0],state[1]],hor=state[-2],ver=state[-1])
+        current_image[0].show()
+        current_text = self.image_to_text.image_captioning(current_image[0])
+        print(current_text[0]['generated_text'])
 
 
 if __name__ == '__main__':
     player = Player()
-    player.run()
+    # player.run()
+    player.test()

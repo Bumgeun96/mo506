@@ -57,7 +57,7 @@ from image_captioning import image_to_text
 
 #######
 def load_image():
-    image = Image.open('./ex/ex1.jpg')
+    image = Image.open('./ex/ex.jpg')
     return image
 
 def image_truncation(image,center = [50,50],hor = 10,ver = 10):
@@ -67,9 +67,9 @@ def image_truncation(image,center = [50,50],hor = 10,ver = 10):
 
 i = load_image()
 print(i.size)
-croppoedImages = image_truncation(i,center = [1750,780],hor=150,ver=100) #ex1
+# croppoedImages = image_truncation(i,center = [1750,780],hor=150,ver=100) #ex1
 # croppoedImages = image_truncation(i,center = [100,300],hor=100,ver=100) #ex2
-# croppoedImages = image_truncation(i,center = [600,600],hor=600,ver=100) #ex
+croppoedImages = image_truncation(i,center = [600,600],hor=600,ver=100) #ex
 # croppoedImages = image_truncation(i,center = [300,250],hor=300,ver=130) #ex3
 Image_to_text = image_to_text()
 raw = Image_to_text.image_captioning(i)

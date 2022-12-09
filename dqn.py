@@ -33,6 +33,7 @@ class DQN:
         #####################################
 
         self.net = Agent(dim_obs, dim_act)  # Q-network
+        self.test_net = Agent(dim_obs, dim_act)
         self.memory = Memory(self.replay_size)  # replay buffer                 # Replay buffer
         self.target_net = deepcopy(self.net)                               # Target Q-network
         self.update_steps = 100  # Update Target Network
@@ -44,6 +45,7 @@ class DQN:
         self.act_size = dim_act
         # self.target_net = Agent(self.num_inputs, self.act_size)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.test_net.load_state_dict(torch.load(CHECKPOINT + '.pt', map_location=torch.device(self.device)))
         
         # update_target_model(self.net, self.target_net)
         self.net.train()
@@ -90,14 +92,21 @@ class DQN:
             update_target_model(self.net, self.target_net)
      
     ######################################################################################
-    def select_action(self, state):
-        state = torch.Tensor(state).to(self.device)
-        qvalue = self.net(state)
-        qvalue = qvalue.cpu().data.numpy()
-        
-        pick_random = int(np.random.rand() <= self.epsilon)
-        random_actions = random.randrange(self.act_size)
-        picked_actions = pick_random * random_actions + (1 - pick_random) * np.argmax(qvalue)
+    def select_action(self, state,test = False):
+        if test:
+            state = torch.Tensor(state)
+            qvalue = self.test_net(state)
+            qvalue = qvalue.cpu().data.numpy()
+        else:
+            state = torch.Tensor(state).to(self.device)    
+            qvalue = self.net(state)
+            qvalue = qvalue.cpu().data.numpy()
+        if test:
+            picked_actions = np.argmax(qvalue)
+        else:
+            pick_random = int(np.random.rand() <= self.epsilon)
+            random_actions = random.randrange(self.act_size)
+            picked_actions = pick_random * random_actions + (1 - pick_random) * np.argmax(qvalue)
         return picked_actions
 
     def store_experience(self, state, next_state, act, rew, done):

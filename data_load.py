@@ -27,12 +27,14 @@ def get_center(json_):
             y1 = i['box2d']['y1']
             y2 = i['box2d']['y2']
             a = i['score']
-    return [x,y,x1,x2,y1,y2,a]
+    # return [x,y,x1,x2,y1,y2,a]
+    return [600,600,500,700,500,700,0.9]
             
-i,j = load_image_data(image=EX1)
-get_center(j)          
+i,j = load_image_data(image=EX)
+get_center(j)
+i.show()      
             
 def get_image_and_center():
-    i,j = load_image_data(image=EX1)
+    i,j = load_image_data(image=EX)
     c = get_center(j)
     return i,c
